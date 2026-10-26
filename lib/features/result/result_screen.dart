@@ -6,6 +6,7 @@ import "package:bmi_calculator/features/result/cubit/result_cubit.dart";
 import "package:bmi_calculator/features/result/cubit/result_state.dart";
 import "package:flutter/material.dart";
 import "package:flutter_bloc/flutter_bloc.dart";
+import "package:flutter_screenutil/flutter_screenutil.dart";
 
 class ResultScreen extends StatefulWidget {
  final double result;
@@ -33,24 +34,28 @@ void initState() {
     
     return Scaffold(
       backgroundColor: ColorsManagers.backgroundColor,
-      appBar: CustomAppbar(),
+      // appBar: CustomAppbar(),
 
-      body: Padding(
-        padding: EdgeInsets.only(top: 15),
+      body: SafeArea(
         child: Column(
+           
           children: [
-            Container(
-              margin: EdgeInsets.symmetric(horizontal: 15),
-              child: Text("Your Result", style: StylesManager.whiteBold30),
+            const CustomAppbar(),
+            Text(
+              "Your Result",
+              style: StylesManager.whiteBold30.copyWith(
+                fontSize: 40.sp,
+              ),
             ),
-
+        
             Container(
-              margin: EdgeInsets.all(20),
-              padding: EdgeInsets.all(20),
-              height: 300,
+              margin: EdgeInsets.only(top: 17.h),
+              padding: EdgeInsets.only(top: 16.h,right: 30.w,left: 30.w),
+              height: 503.h,
+              width: 319.w,
               decoration: BoxDecoration(
                 color: ColorsManagers.primaryColor,
-                borderRadius: BorderRadius.circular(20),
+                borderRadius: BorderRadius.circular(16.r),
               ),
               child: Center(
                 child: BlocBuilder<ResultCubit,ResultState>(
@@ -61,15 +66,20 @@ void initState() {
                   children: [
                     Text(
                       state.result.status,    
-                      style: StylesManager.whiteBold30.copyWith(color: state.result.color),
+                      style: StylesManager.whiteBold30.copyWith(color: state.result.color,fontSize: 20.sp),
                     ),
                     Text(
                       state.result.score.toStringAsFixed(2),
-                      style: StylesManager.whiteBold30,
+                      style: StylesManager.whiteBold30.copyWith(
+                        fontSize: 64.sp
+                      ),
                     ),
+                    SizedBox(height: 60.h,),
                     Text(
+                      
                       "You Have a Normal Body Weight,Good Job.",
-                      style: TextStyle(color: Colors.grey.withAlpha(100)),
+                      textAlign: TextAlign.center,
+                      style: TextStyle(color: Colors.grey.withAlpha(100),fontSize: 16.sp),
                     ),
                   ],
                 );

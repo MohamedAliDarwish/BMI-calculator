@@ -2,68 +2,54 @@ import 'package:bmi_calculator/core/colors_managers.dart';
 import 'package:bmi_calculator/core/styles_manager.dart';
 import 'package:bmi_calculator/core/widgets/custom_appbar.dart';
 import 'package:bmi_calculator/core/widgets/custom_btn.dart';
-import 'package:bmi_calculator/features/home/cubit/bmi_cubit/bmi_cubit.dart';
-import 'package:bmi_calculator/features/home/cubit/gender_cubit/gender_cubit.dart';
-import 'package:bmi_calculator/features/home/cubit/heigth_cubit/height_cubit.dart';
-import 'package:bmi_calculator/features/home/cubit/heigth_cubit/height_state.dart';
-import 'package:bmi_calculator/features/home/cubit/weight_age_cubit/weight_age_cubit.dart';
-import 'package:bmi_calculator/features/home/cubit/weight_age_cubit/weight_age_state.dart';
+import 'package:bmi_calculator/features/home/cubit/home_cubit.dart';
+import 'package:bmi_calculator/features/home/cubit/home_state.dart';
 import 'package:bmi_calculator/features/home/widgets/gender_card.dart';
 import 'package:bmi_calculator/features/home/widgets/weight_age_card.dart';
 import 'package:bmi_calculator/features/result/cubit/result_cubit.dart';
 import 'package:bmi_calculator/features/result/result_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
-class HomeScreen extends StatefulWidget {
+class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
-
-  @override
-  State<HomeScreen> createState() => _HomeScreenState();
-}
-
-class _HomeScreenState extends State<HomeScreen> {
-
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: ColorsManagers.primaryColor,
-      appBar: CustomAppbar(),
-
-      body: Padding(
-        padding: EdgeInsets.only(top: 15),
+      body: SafeArea(
         child: Column(
           children: [
+            const CustomAppbar(),
             Row(
+              mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 GenderCard(
                   title: "Male",
                   icon: Icons.male,
-                  
                   onTap: () {
-                   context.read<GenderCubit>().toggleGender(selectedGender: "male");
-                    
-                    
-
+                    context.read<HomeCubit>().changeGender("male");
                   },
                 ),
-                 GenderCard(
+                SizedBox(width: 9.w),
+                GenderCard(
                   title: "Female",
                   icon: Icons.female,
                   onTap: () {
-                    
-                   context.read<GenderCubit>().toggleGender(selectedGender: "female");
+                    context.read<HomeCubit>().changeGender("female");
                   },
                 ),
               ],
             ),
-
+            SizedBox(height: 20.h),
             Container(
-              margin: EdgeInsets.symmetric(horizontal: 15),
+              height: 189.h,
+              width: 319.w,
               decoration: BoxDecoration(
                 color: Colors.grey.withValues(alpha: 0.5),
-                borderRadius: BorderRadius.circular(20),
+                borderRadius: BorderRadius.circular(16.r),
               ),
               child: Column(
                 children: [
@@ -71,97 +57,88 @@ class _HomeScreenState extends State<HomeScreen> {
                     "Height",
                     style: StylesManager.whiteBold30.copyWith(
                       color: ColorsManagers.primaryColor,
+                      fontSize: 20.sp,
                     ),
                   ),
-
-                 BlocBuilder<HeightCubit,HeightState>(builder: (context, state) {
-                   return  Text(
-                    "${state.height.toInt()} cm",
-                    style: StylesManager.whiteBold30,
-                  );
-                 },),
-
-                  BlocBuilder<HeightCubit,HeightState>(builder: (context, state) {
-                    return Slider(
-                    min: 100,
-                    max: 250,
-                    activeColor: ColorsManagers.secColor,
-                    value: state.height,
-                    onChanged: (value) {
-                      context.read<HeightCubit>().changeHeight(value);
+                  BlocBuilder<HomeCubit, HomeState>(
+                    builder: (context, state) {
+                      return Text(
+                        "${state.height.toInt()} cm",
+                        style: StylesManager.whiteBold30.copyWith(
+                          fontSize: 40.sp,
+                        ),
+                      );
                     },
-                  );
-                  },)
+                  ),
+                  BlocBuilder<HomeCubit, HomeState>(
+                    builder: (context, state) {
+                      return Slider(
+                        min: 100,
+                        max: 250,
+                        activeColor: ColorsManagers.secColor,
+                        value: state.height,
+                        onChanged: (value) {
+                          context.read<HomeCubit>().changeHeight(value);
+                        },
+                      );
+                    },
+                  ),
                 ],
               ),
             ),
-            SizedBox(height: 20),
+            SizedBox(height: 20.h),
             Row(
+              mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                // WeightAndAgeCard(age: age, weight: weight, isAge: false),
-                // WeightAndAgeCard(age: age, weight: weight, isAge: true),
-                BlocBuilder<WeightAgeCubit,WeightAgeState>(
+                BlocBuilder<HomeCubit, HomeState>(
                   builder: (context, state) {
                     return WeightAndAgeCard(
-                    age: state.age,
-                    weight: state.weight,
-                    isAge: false,
-                    onIncrease: () {
-                      context.read<WeightAgeCubit>().incrementWeightAge(isAge: false);
-                    },
-                    onDecrease: () {
-                      context.read<WeightAgeCubit>().decrementWeightAge(isAge: false);
-                    },
-                  );
+                      age: state.age,
+                      weight: state.weight,
+                      isAge: false,
+                      onIncrease: () {
+                        context.read<HomeCubit>().changeWeight(isIncrement: true);
+                      },
+                      onDecrease: () {
+                        context.read<HomeCubit>().changeWeight(isIncrement: false);
+                      },
+                    );
                   },
                 ),
-
-                BlocBuilder<WeightAgeCubit,WeightAgeState>(
+                SizedBox(width: 13.sp),
+                BlocBuilder<HomeCubit, HomeState>(
                   builder: (context, state) {
                     return WeightAndAgeCard(
-                    age: state.age,
-                    weight: state.weight,
-                    isAge: true,
-                    onIncrease: () {
-                      context.read<WeightAgeCubit>().incrementWeightAge(isAge: true);
-                    },
-                    onDecrease: () {
-                      context.read<WeightAgeCubit>().decrementWeightAge(isAge: true);
-                    },
-                  );
+                      age: state.age,
+                      weight: state.weight,
+                      isAge: true,
+                      onIncrease: () {
+                        context.read<HomeCubit>().changeAge(isIncrement: true);
+                      },
+                      onDecrease: () {
+                        context.read<HomeCubit>().changeAge(isIncrement: false);
+                      },
+                    );
                   },
                 ),
-
-               
               ],
             ),
-
-            Spacer(),
+            const Spacer(),
             CustomBtn(
-              onTap: (){
-                context.read<BmiCubit>().calculateBmi(context: context);
-                double result = context.read<BmiCubit>().state.result;
-              //  print(result);
-              //  
-
-                // Navigator.push(context, MaterialPageRoute(builder: (context)=> ResultScreen(result: result)));
-
-Navigator.push(
-  context,
-  MaterialPageRoute(
-    builder: (context) => BlocProvider.value(
-      value: context.read<ResultCubit>(),
-      child: ResultScreen(result: result),
-    ),
-  ),
-);
-
+              onTap: () {
+                final result = context.read<HomeCubit>().calculateBmi();
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => BlocProvider.value(
+                      value: context.read<ResultCubit>(),
+                      child: ResultScreen(result: result),
+                    ),
+                  ),
+                );
               },
-             
               txt: "Calculate",
             ),
-
-           
           ],
         ),
       ),
